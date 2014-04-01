@@ -207,6 +207,7 @@ public class BtreeHash {
 			answers.println("Key: " + key);
 			answers.println("Data: " + data);
 			answers.println(" ");
+			answers.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

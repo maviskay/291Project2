@@ -188,13 +188,32 @@ public class BtreeHash {
 	// Searches the database by the range of key values
 	public static boolean searchByKeyRange(Database db, String lower, String upper) {
 		try {
+			long startTime = 0;
 			Cursor dbCursor = db.openCursor(null, null);
 			DatabaseEntry lowerKey = new DatabaseEntry();
 			DatabaseEntry upperKey = new DatabaseEntry();
+			DatabaseEntry data = new DatabaseEntry();
+			DatabaseEntry key = lowerKey;
 			lowerKey.setData(lower.getBytes());
 			lowerKey.setSize(lower.length());
 			upperKey.setData(upper.getBytes());
 			upperKey.setSize(upper.length());
+			
+			dbCursor.getSearchKey(key, data, LockMode.DEFAULT);	
+			while (key != upperKey) {
+				startTime = System.nanoTime();
+				if (db.get(null, key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+					long totalTime = (System.nanoTime() - startTime) / 1000;
+					System.out.println("database took "+ totalTime + " microseconds to search by key range");
+					String keyString = new String(key.getData());
+					String dataString = new String(data.getData());
+					writeToFile(keyString, dataString);
+					System.out.println("The key - data pair is:\n " + "\t" + keyString + "\n\t" + dataString + "\n");
+				}
+				dbCursor.getNext(key, data, LockMode.DEFAULT);
+			}
+			return true;
+			
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}

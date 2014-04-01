@@ -1,9 +1,8 @@
 import com.sleepycat.db.*;
 
 public class Indexfile {
-	private static Database db = null;
 	// Create the database
-	public static Database create(String option) {
+	public static Database create(Database db, String option) {
 		
 		return db;
 	}

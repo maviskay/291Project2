@@ -8,34 +8,37 @@ public class BtreeHash {
 	private static final int recordsCount = 1000;
 
     // Create the database
-	public static Database create(String option) {
-		Database db = null;
-		// If database is not already created
-			try {
-				DatabaseConfig dbConfig = new DatabaseConfig();
-				// Create btree database
-				if (option.equalsIgnoreCase("btree")) {
-					dbConfig.setType(DatabaseType.BTREE);
-					//dbConfig.setExclusiveCreate(true);
-					dbConfig.setAllowCreate(true);
-					db = new Database(BTREEDB, null, dbConfig);
-					System.out.println(BTREEDB + " has been created");
-				// Create hash database
-				} else if (option.equalsIgnoreCase("hash")) {
-					dbConfig.setType(DatabaseType.HASH);
-					//dbConfig.setExclusiveCreate(true);
-					dbConfig.setAllowCreate(true);
-					db = new Database(HASHDB, null, dbConfig);
-					System.out.println(HASHDB + " has been created");
+	public static Database create(Database db, String option) {
+		if (db == null) {
+			// If database is not already created
+				try {
+					DatabaseConfig dbConfig = new DatabaseConfig();
+					// Create btree database
+					if (option.equalsIgnoreCase("btree")) {
+						dbConfig.setType(DatabaseType.BTREE);
+						//dbConfig.setExclusiveCreate(true);
+						dbConfig.setAllowCreate(true);
+						db = new Database(BTREEDB, null, dbConfig);
+						System.out.println(BTREEDB + " has been created");
+					// Create hash database
+					} else if (option.equalsIgnoreCase("hash")) {
+						dbConfig.setType(DatabaseType.HASH);
+						//dbConfig.setExclusiveCreate(true);
+						dbConfig.setAllowCreate(true);
+						db = new Database(HASHDB, null, dbConfig);
+						System.out.println(HASHDB + " has been created");
+					}
+					// Populate database
+					populate(db, recordsCount);
+					System.out.println("1000 records inserted\n");
+					db.close();
+					return db;
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				// Populate database
-				populate(db, recordsCount);
-				System.out.println("1000 records inserted");
-				db.close();
-				return db;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		} else {
+			System.out.println (option + " database already exists\n");
+		}
 		return db;
 	}
 	
@@ -133,9 +136,11 @@ public class BtreeHash {
 			if (type.equalsIgnoreCase("key")){
 				key.setData(inputString.getBytes());
 				key.setSize(inputString.length());
+				data = null;
 			} else if (type.equalsIgnoreCase("data")) {
 				data.setData(inputString.getBytes());
 				data.setSize(inputString.length());
+				key = null;
 			}
 			long startTime = System.nanoTime();
 			// Key-data pair found

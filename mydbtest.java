@@ -52,9 +52,9 @@ public class mydbtest {
 				// Create & populate database
 				if (selection == 1){
 					if (option.equalsIgnoreCase("indexfile")) {
-						db = Indexfile.create(option);
+						db = Indexfile.create(db, option);
 					} else {
-						db = BtreeHash.create(option);
+						db = BtreeHash.create(db, option);
 					}
 				// Search by key, data, or range
 				} else if (selection >= 2 && selection <= 4) {
@@ -78,6 +78,7 @@ public class mydbtest {
 								} else if (option.equalsIgnoreCase("hash")) {
 									Database.remove(HASHDB, null, null);
 								}
+								db = null;
 							} catch (DatabaseException e) {
 								e.printStackTrace();
 							} catch (FileNotFoundException e) {

@@ -35,7 +35,7 @@ public class mydbtest {
 	}
 
 	// Requests user for selection
-	public static void requestOption(String option) {
+	public static void requestOption(String dbType) {
 		Database db = null;
 		
 		while (true) {
@@ -51,31 +51,31 @@ public class mydbtest {
 				int selection = keyboard.nextInt();
 				// Create & populate database
 				if (selection == 1){
-					if (option.equalsIgnoreCase("indexfile")) {
-						db = Indexfile.create(db, option);
+					if (dbType.equalsIgnoreCase("indexfile")) {
+						db = Indexfile.create(db, dbType);
 					} else {
-						db = BtreeHash.create(db, option);
+						db = BtreeHash.create(db, dbType);
 					}
 				// Search by key, data, or range
 				} else if (selection >= 2 && selection <= 4) {
-					if (option.equalsIgnoreCase("indexfile")) {
+					if (dbType.equalsIgnoreCase("indexfile")) {
 						Indexfile.search(db, selection);
 					} else {
-						BtreeHash.search(db, option, selection);
+						BtreeHash.search(db, dbType, selection);
 					}
 				// Destroy database
 				} else if (selection == 5) {
 					if (db != null) {
 						// Destroy index file database
-						if (option.equalsIgnoreCase("indexfile")) {
+						if (dbType.equalsIgnoreCase("indexfile")) {
 							
 						} else {
 							try {
 								// Destroy btree database
-								if (option.equalsIgnoreCase("btree")) {
+								if (dbType.equalsIgnoreCase("btree")) {
 									Database.remove(BTREEDB, null, null);
 								// Destroy hash database
-								} else if (option.equalsIgnoreCase("hash")) {
+								} else if (dbType.equalsIgnoreCase("hash")) {
 									Database.remove(HASHDB, null, null);
 								}
 								db = null;
@@ -86,7 +86,7 @@ public class mydbtest {
 							}
 						}
 					} else {
-						System.out.println (option + " database does not exist\n");
+						System.out.println (dbType + " database does not exist\n");
 					}
 				// Quit
 				} else if (selection == 6) {

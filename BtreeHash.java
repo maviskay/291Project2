@@ -1,11 +1,15 @@
 import com.sleepycat.db.*;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.File;
 import java.util.*;
 
 public class BtreeHash {
 	private static final String BTREEDB = "/tmp/maviskay_db/Btree_db";
 	private static final String HASHDB = "/tmp/maviskay_db/Hash_db";
 	private static final int recordsCount = 1000;
+	File logFile = new File("/cshome/gaboriau/CMPUT291/291Project2/answers.txt");
 
     // Create the database
 	public static Database create(Database db, String option) {
@@ -151,6 +155,7 @@ public class BtreeHash {
 				String keyString = new String(key.getData());
 				String dataString = new String(data.getData());
 				System.out.println("The key - data pair is: " + keyString + " - " + dataString);
+				writeToFile(key.toString(), data.toString());
 				return true;
 			}
 		} catch (DatabaseException e) {
@@ -190,5 +195,18 @@ public class BtreeHash {
 			return false;
 		}
 		return true;
+	}
+	
+	// Write the search results to the answers.txt file 
+	public static void writeToFile(String key, String data) {
+		try {
+			PrintWriter answers = new PrintWriter("answers.txt");
+			answers.println("Key: " + key);
+			answers.println("Data: " + data);
+			answers.println(" ");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	
 	}
 }

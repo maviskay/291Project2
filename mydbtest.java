@@ -65,24 +65,27 @@ public class mydbtest {
 					}
 				// Destroy database
 				} else if (selection == 5) {
-					// Destroy index file database
-					if (option.equalsIgnoreCase("indexfile")) {
-						
-					} else {
-						try {
-							db.close();
-							// Destroy btree database
-							if (option.equalsIgnoreCase("btree")) {
-								Database.remove(BTREEDB, null, null);
-							// Destroy hash database
-							} else if (option.equalsIgnoreCase("hash")) {
-								Database.remove(HASHDB, null, null);
+					if (db != null) {
+						// Destroy index file database
+						if (option.equalsIgnoreCase("indexfile")) {
+							
+						} else {
+							try {
+								// Destroy btree database
+								if (option.equalsIgnoreCase("btree")) {
+									Database.remove(BTREEDB, null, null);
+								// Destroy hash database
+								} else if (option.equalsIgnoreCase("hash")) {
+									Database.remove(HASHDB, null, null);
+								}
+							} catch (DatabaseException e) {
+								e.printStackTrace();
+							} catch (FileNotFoundException e) {
+								e.printStackTrace();
 							}
-						} catch (DatabaseException e) {
-							e.printStackTrace();
-						} catch (FileNotFoundException e) {
-							e.printStackTrace();
 						}
+					} else {
+						System.out.println (option + " database does not exist\n");
 					}
 				// Quit
 				} else if (selection == 6) {

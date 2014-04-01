@@ -140,8 +140,14 @@ public class BtreeHash {
 				key.setData(inputString.getBytes());
 				key.setSize(inputString.length());
 			} else if (searchType.equalsIgnoreCase("data")) {	
-				data.setData(inputString.getBytes());
-				data.setSize(inputString.length());
+				Cursor dbCursorData = db.openCursor(null, null);
+				dbCursorData.getFirst(key, data, LockMode.DEFAULT);
+				if (inputString.equals(new String(data.getData()))) {
+					String keyString = new String(key.getData());
+					String dataString = new String(data.getData());
+					writeToFile(keyString, dataString);
+					System.out.println("The key - data pair is:\n " + "\t" + keyString + "\n\t" + dataString + "\n");
+				}
 			}
 			long startTime = System.nanoTime();
 			// Key-data pair found
@@ -150,7 +156,7 @@ public class BtreeHash {
 				System.out.println(dbType + " database took "+ totalTime + " microseconds to search by " + searchType);
 				String keyString = new String(key.getData());
 				String dataString = new String(data.getData());
-				writeToFile(key.toString(), data.toString());
+				writeToFile(keyString, dataString);
 				System.out.println("The key - data pair is:\n " + "\t" + keyString + "\n\t" + dataString + "\n");
 				return true;
 			}

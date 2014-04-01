@@ -1,16 +1,17 @@
 import com.sleepycat.db.*;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.File;
 import java.util.*;
 
 public class BtreeHash {
 	private static final String BTREEDB = "/tmp/maviskay_db/Btree_db";
 	private static final String HASHDB = "/tmp/maviskay_db/Hash_db";
 	private static final int recordsCount = 1000;
-	File logFile = new File("/cshome/gaboriau/CMPUT291/291Project2/answers.txt");
-
+	
     // Create the database
 	public static Database create(Database db, String option) {
 		if (db == null) {
@@ -200,11 +201,13 @@ public class BtreeHash {
 	// Write the search results to the answers.txt file 
 	public static void writeToFile(String key, String data) {
 		try {
-			PrintWriter answers = new PrintWriter("answers.txt");
+			PrintWriter answers;
+			answers = new PrintWriter(new BufferedWriter(new FileWriter("answers.txt", true)));
+
 			answers.println("Key: " + key);
 			answers.println("Data: " + data);
 			answers.println(" ");
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	

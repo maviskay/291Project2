@@ -1,7 +1,6 @@
 import com.sleepycat.db.*;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -134,37 +133,55 @@ public class BtreeHash {
 	// Searches the database by the specified key or data value
 	public static boolean searchByKeyData(Database db, String inputString, String searchType, String dbType) {
 		try {
+			long startTime = 0;
 			DatabaseEntry key = new DatabaseEntry();
 			DatabaseEntry data = new DatabaseEntry();
+			// Search by key
 			if (searchType.equalsIgnoreCase("key")){
 				key.setData(inputString.getBytes());
 				key.setSize(inputString.length());
-			} else if (searchType.equalsIgnoreCase("data")) {	
-				Cursor dbCursorData = db.openCursor(null, null);
-				dbCursorData.getFirst(key, data, LockMode.DEFAULT);
-				if (inputString.equals(new String(data.getData()))) {
+				startTime = System.nanoTime();
+				// Key-data pair found
+				if (db.get(null, key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+					long totalTime = (System.nanoTime() - startTime) / 1000;
+					System.out.println(dbType + " database took "+ totalTime + " microseconds to search by " + searchType);
 					String keyString = new String(key.getData());
 					String dataString = new String(data.getData());
 					writeToFile(keyString, dataString);
 					System.out.println("The key - data pair is:\n " + "\t" + keyString + "\n\t" + dataString + "\n");
+					return true;
+				}
+			// Search by data
+			} else if (searchType.equalsIgnoreCase("data")) {	
+				int count = 0;
+				Cursor dbCursorData = db.openCursor(null, null);
+				startTime = System.nanoTime();
+				dbCursorData.getFirst(key, data, LockMode.DEFAULT);
+				do
+					if (inputString.equals(new String(data.getData()))) {
+						String keyString = new String(key.getData());
+						String dataString = new String(data.getData());
+						writeToFile(keyString, dataString);
+						System.out.println("The key - data pair is:\n " + "\t" + keyString + "\n\t" + dataString + "\n");
+						count++;
+					}
+				while (dbCursorData.getNext(key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS);
+				// Key-data pairs found
+				if (count != 0) {
+					long totalTime = (System.nanoTime() - startTime) / 1000;
+					System.out.println(dbType + " database took "+ totalTime + " microseconds to search by " + searchType);
+					System.out.println(" \t" + count + " results were found");
+					return true;
 				}
 			}
-			long startTime = System.nanoTime();
-			// Key-data pair found
-			if (db.get(null, key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-				long totalTime = (System.nanoTime() - startTime) / 1000;
-				System.out.println(dbType + " database took "+ totalTime + " microseconds to search by " + searchType);
-				String keyString = new String(key.getData());
-				String dataString = new String(data.getData());
-				writeToFile(keyString, dataString);
-				System.out.println("The key - data pair is:\n " + "\t" + keyString + "\n\t" + dataString + "\n");
-				return true;
-			}
+			// No key-data pairs found
+			long totalTime = (System.nanoTime() - startTime) / 1000;
+			System.out.println(dbType + " database took "+ totalTime + " microseconds to search by " + searchType);
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
 		// Fallthrough case
-		System.out.println("No matching " + searchType + " was not found");
+		System.out.println("No matching " + searchType + " was not found\n");
 		return false;
 	}
 	

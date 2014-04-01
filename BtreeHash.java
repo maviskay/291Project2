@@ -31,7 +31,6 @@ public class BtreeHash {
 					// Populate database
 					populate(db, recordsCount);
 					System.out.println("1000 records inserted\n");
-					db.close();
 					return db;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -136,18 +135,22 @@ public class BtreeHash {
 			if (type.equalsIgnoreCase("key")){
 				key.setData(inputString.getBytes());
 				key.setSize(inputString.length());
-				data = null;
+				data.setData("".getBytes());
+				data.setSize("".length());
 			} else if (type.equalsIgnoreCase("data")) {
 				data.setData(inputString.getBytes());
 				data.setSize(inputString.length());
-				key = null;
+				key.setData("".getBytes());
+				key.setSize("".length());
 			}
 			long startTime = System.nanoTime();
 			// Key-data pair found
-			if (db.get(null, key, data, null) == OperationStatus.SUCCESS) {
+			if (db.get(null, key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				long totalTime = (System.nanoTime() - startTime) / 1000;
 				System.out.println(db.getDatabaseName() + " took "+ totalTime + " microseconds to search by " + type);
-				System.out.println("The key - data pair is: " + key.toString() + " - " + data.toString());
+				String keyString = new String(key.getData());
+				String dataString = new String(data.getData());
+				System.out.println("The key - data pair is: " + keyString + " - " + dataString);
 				return true;
 			}
 		} catch (DatabaseException e) {

@@ -93,8 +93,11 @@ public class BtreeHash {
 			Scanner keyboard = new Scanner(System.in);
 			// By key
 			if (searchType == 2) {
-				System.out.print("Enter a key to search: ");
+				System.out.print("Enter a key to search (-1 to return): ");
 				String key = keyboard.nextLine();
+				if(checkReturn(key)){
+					return;
+				}
 				if(isValid(key)) {
 					// Searches database by specified key - returns if key-data pair is found
 					if(searchByKeyData(db, key, "key", dbType)) {
@@ -103,8 +106,11 @@ public class BtreeHash {
 				}
 			// By data
 			} else if (searchType == 3) {
-				System.out.print("Enter a data value to search: ");
+				System.out.print("Enter a data value to search (-1 to return): ");
 				String data = keyboard.nextLine();
+				if(checkReturn(data)){
+					return;
+				}
 				if(isValid(data)) {
 					// Searches database by specified data - returns if key-data pair is found
 					if(searchByKeyData(db, data, "data", dbType)) {
@@ -113,17 +119,23 @@ public class BtreeHash {
 				}
 			// By range of keys
 			} else if (searchType == 4) {
-				System.out.print("Enter a lower bound key to search: ");
+				System.out.print("Enter a lower bound key to search (-1 to return): ");
 				String lowerKey = keyboard.nextLine();
-				System.out.print("Enter a upper bound key to search: ");
+				if(checkReturn(lowerKey)){
+					return;
+				}
+				System.out.print("Enter a upper bound key to search (-1 to return): ");
 				String upperKey = keyboard.nextLine();
+				if(checkReturn(upperKey)){
+					return;
+				}
 				if(isValid(lowerKey) && isValid(upperKey)) {
 					if(lowerKey.compareTo(upperKey) < 0) {
-						if(searchByKeyRange(db, lowerKey, upperKey)) {
+						if(searchByKeyRange(db, lowerKey, upperKey, dbType)) {
 							
 						}
 					} else {
-						System.out.print("Lower bound key must be smaller than upper bound key. Please try again: ");
+						System.out.print("Lower bound key must be smaller than upper bound key");
 					}
 				}
 			}	
@@ -162,7 +174,7 @@ public class BtreeHash {
 						String keyString = new String(key.getData());
 						String dataString = new String(data.getData());
 						writeToFile(keyString, dataString);
-						System.out.println("The key - data pair is:\n " + "\t" + keyString + "\n\t" + dataString + "\n");
+						System.out.println("The key - data pair is:\n " + "\t" + keyString + "\n\t" + dataString);
 						count++;
 					}
 				while (dbCursorData.getNext(key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS);
@@ -170,7 +182,7 @@ public class BtreeHash {
 				if (count != 0) {
 					long totalTime = (System.nanoTime() - startTime) / 1000;
 					System.out.println(dbType + " database took "+ totalTime + " microseconds to search by " + searchType);
-					System.out.println(" \t" + count + " results were found");
+					System.out.println(" \t" + count + " results were found\n");
 					return true;
 				}
 			}
@@ -186,7 +198,7 @@ public class BtreeHash {
 	}
 	
 	// Searches the database by the range of key values
-	public static boolean searchByKeyRange(Database db, String lower, String upper) {
+	public static boolean searchByKeyRange(Database db, String lower, String upper, String dbType) {
 		try {
 			long startTime = 0;
 			Cursor dbCursor = db.openCursor(null, null);
@@ -204,16 +216,15 @@ public class BtreeHash {
 				startTime = System.nanoTime();
 				if (db.get(null, key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 					long totalTime = (System.nanoTime() - startTime) / 1000;
-					System.out.println("database took "+ totalTime + " microseconds to search by key range");
+					System.out.println(dbType + " database took "+ totalTime + " microseconds to search by key range");
 					String keyString = new String(key.getData());
 					String dataString = new String(data.getData());
 					writeToFile(keyString, dataString);
-					System.out.println("The key - data pair is:\n " + "\t" + keyString + "\n\t" + dataString + "\n");
+					System.out.println("The key - data pair is:\n " + "\t" + keyString + "\n\t" + dataString);
 				}
 				dbCursor.getNext(key, data, LockMode.DEFAULT);
 			}
 			return true;
-			
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
@@ -226,20 +237,20 @@ public class BtreeHash {
 	public static boolean isValid(String input) {
 		// Check if valid key or data
 		if (input.length() < 64 || input.length() > 127) {
-			System.out.print("Length of input invalid, please try again: ");
+			System.out.println("Length of input invalid");
 			return false;
 		}
 		// Check if input contains only alphabets
 		char[] characters = input.toCharArray();
 		for (char c : characters){
 			if (!Character.isLetter(c)) {
-				System.out.print("Input must only be roman characters. Please try again: ");
+				System.out.println("Input must only be roman characters");
 				return false;
 			}
 		}
 		// Check if input is all lower case
 		if (!input.equals(input.toLowerCase())) {
-			System.out.print("Input must be in lowercase. Please try again: ");
+			System.out.println("Input must be in lowercase");
 			return false;
 		}
 		return true;

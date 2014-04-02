@@ -9,7 +9,7 @@ import java.util.*;
 public class BtreeHash {
 	private static final String BTREEDB = "/tmp/maviskay_db/Btree_db";
 	private static final String HASHDB = "/tmp/maviskay_db/Hash_db";
-	private static final int recordsCount = 1000;
+	private static final int recordsCount = 100000;
 
     // Create the database
 	public static Database create(Database db, String dbType) {
@@ -20,20 +20,18 @@ public class BtreeHash {
 					// Create btree database
 					if (dbType.equalsIgnoreCase("btree")) {
 						dbConfig.setType(DatabaseType.BTREE);
-						//dbConfig.setExclusiveCreate(true);
 						dbConfig.setAllowCreate(true);
 						db = new Database(BTREEDB, null, dbConfig);
 					// Create hash database
 					} else if (dbType.equalsIgnoreCase("hash")) {
 						dbConfig.setType(DatabaseType.HASH);
-						//dbConfig.setExclusiveCreate(true);
 						dbConfig.setAllowCreate(true);
 						db = new Database(HASHDB, null, dbConfig);
 					}
 					// Populate database
 					System.out.println(dbType + " database has been created");
 					populate(db, recordsCount);
-					System.out.println("1000 records inserted\n");
+					System.out.println(recordsCount + " records inserted\n");
 					return db;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -129,10 +127,11 @@ public class BtreeHash {
 				if(checkReturn(upperKey)){
 					return;
 				}
+				// Searches database by key bounds - returns if key-data pair is found
 				if(isValid(lowerKey) && isValid(upperKey)) {
 					if(lowerKey.compareTo(upperKey) < 0) {
 						if(searchByKeyRange(db, lowerKey, upperKey, dbType)) {
-							
+							return;
 						}
 					} else {
 						System.out.print("Lower bound key must be smaller than upper bound key");
@@ -160,24 +159,28 @@ public class BtreeHash {
 					String keyString = new String(key.getData());
 					String dataString = new String(data.getData());
 					writeToFile(keyString, dataString);
-					System.out.println("The key - data pair is:\n " + "\t" + keyString + "\n\t" + dataString + "\n");
+					System.out.println("The key - data pair is:\n " + "\tkey:\t" + keyString + "\n\tdata:\t" + dataString + "\n");
 					return true;
 				}
 			// Search by data
 			} else if (searchType.equalsIgnoreCase("data")) {	
 				int count = 0;
 				Cursor dbCursorData = db.openCursor(null, null);
+				data.setData(inputString.getBytes());
+				data.setSize(inputString.length());
 				startTime = System.nanoTime();
 				dbCursorData.getFirst(key, data, LockMode.DEFAULT);
-				do
+				do {
 					if (inputString.equals(new String(data.getData()))) {
 						String keyString = new String(key.getData());
 						String dataString = new String(data.getData());
 						writeToFile(keyString, dataString);
-						System.out.println("The key - data pair is:\n " + "\t" + keyString + "\n\t" + dataString);
+						System.out.println("The key - data pair is:\n " + "\tkey:\t" + keyString + "\n\tdata:\t" + dataString);
 						count++;
 					}
-				while (dbCursorData.getNext(key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS);
+					data.setData(inputString.getBytes());
+					data.setSize(inputString.length());
+				} while (dbCursorData.getNext(key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS);
 				// Key-data pairs found
 				if (count != 0) {
 					long totalTime = (System.nanoTime() - startTime) / 1000;
@@ -220,7 +223,7 @@ public class BtreeHash {
 					String keyString = new String(key.getData());
 					String dataString = new String(data.getData());
 					writeToFile(keyString, dataString);
-					System.out.println("The key - data pair is:\n " + "\t" + keyString + "\n\t" + dataString);
+					System.out.println("The key - data pair is:\n " + "\tkey:\t" + keyString + "\n\tdata:\t" + dataString);
 				}
 				dbCursor.getNext(key, data, LockMode.DEFAULT);
 			}
@@ -269,6 +272,15 @@ public class BtreeHash {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
 	
+	// Check if user wishes to go back a step
+	public static boolean checkReturn(String input){
+		if(input.equals("-1")){
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
+

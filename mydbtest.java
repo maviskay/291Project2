@@ -1,4 +1,4 @@
-// TODO: Implement indexfile database
+// TODO: test and document results + report
 
 import com.sleepycat.db.*;
 import java.io.*;
@@ -8,6 +8,8 @@ public class mydbtest {
 	private static final String path = "/tmp/maviskay_db";
 	private static final String BTREEDB = "/tmp/maviskay_db/Btree_db";
 	private static final String HASHDB = "/tmp/maviskay_db/Hash_db";
+	private static final String INDEXDB = "/tmp/maviskay_db/Index_db";
+	private static final String INDEXDBREV = "/tmp/maviskay_db/IndexRev_db";
 	
 	public static void main(String[] args) {
 		// Check if option was selected		
@@ -36,7 +38,9 @@ public class mydbtest {
 
 	// Requests user for selection
 	public static void requestOption(String dbType) {
+		List<Database> dbList = new ArrayList<Database>();
 		Database db = null;
+		Database dbIndex = null;
 		
 		while (true) {
 			System.out.println("Please select an option:");
@@ -52,14 +56,16 @@ public class mydbtest {
 				// Create & populate database
 				if (selection == 1){
 					if (dbType.equalsIgnoreCase("indexfile")) {
-						db = Indexfile.create(db, dbType);
+						dbList = Indexfile.create(db, dbIndex, dbType);
+						db = dbList.get(0);
+						dbIndex = dbList.get(1);
 					} else {
 						db = BtreeHash.create(db, dbType);
 					}
 				// Search by key, data, or range
 				} else if (selection >= 2 && selection <= 4) {
 					if (dbType.equalsIgnoreCase("indexfile")) {
-						Indexfile.search(db, selection);
+						Indexfile.search(db, dbIndex, dbType, selection);
 					} else {
 						BtreeHash.search(db, dbType, selection);
 					}
@@ -68,7 +74,16 @@ public class mydbtest {
 					if (db != null) {
 						// Destroy index file database
 						if (dbType.equalsIgnoreCase("indexfile")) {
-							
+							try{
+								Database.remove(INDEXDB, null, null);
+								Database.remove(INDEXDBREV, null, null);
+								db = null;
+								dbIndex = null;
+							} catch (DatabaseException e) {
+								e.printStackTrace();
+							} catch (FileNotFoundException e) {
+								e.printStackTrace();
+							}
 						} else {
 							try {
 								// Destroy btree database
@@ -82,8 +97,13 @@ public class mydbtest {
 							} catch (DatabaseException e) {
 								e.printStackTrace();
 							} catch (FileNotFoundException e) {
+								db = null;
 								e.printStackTrace();
 							}
+						}
+						boolean deleteAns = new File("answers.txt").delete();
+						if (!deleteAns) {
+							System.out.println("Could not delete answers.txt, may want to check if answers.txt is still in directory. \n");
 						}
 					} else {
 						System.out.println (dbType + " database does not exist\n");

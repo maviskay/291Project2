@@ -210,24 +210,24 @@ public class BtreeHash {
 			DatabaseEntry lowerKey = new DatabaseEntry();
 			DatabaseEntry upperKey = new DatabaseEntry();
 			DatabaseEntry data = new DatabaseEntry();
-			DatabaseEntry key = lowerKey;
+			DatabaseEntry key = new DatabaseEntry();
 			lowerKey.setData(lower.getBytes());
 			lowerKey.setSize(lower.length());
 			upperKey.setData(upper.getBytes());
 			upperKey.setSize(upper.length());
 			
-			dbCursor.getSearchKey(key, data, LockMode.DEFAULT);	
+			dbCursor.getFirst(key, data, LockMode.DEFAULT);
+			String keyString = new String(key.getData());
 			startTime = System.nanoTime();
-			while (key != upperKey) {
-				if (db.get(null, key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+			do {	
+				if (keyString.compareTo(upper) <= 0 && keyString.compareTo(lower) >= 0) {
 					rtn = true;
-					String keyString = new String(key.getData());
+					keyString = new String(key.getData());
 					String dataString = new String(data.getData());
 					writeToFile(keyString, dataString);
 					System.out.println("The key - data pair is:\n " + "\tkey:\t" + keyString + "\n\tdata:\t" + dataString);
 				}
-				dbCursor.getNext(key, data, LockMode.DEFAULT);
-			}
+			} while (dbCursor.getNext(key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS);
 			long totalTime = (System.nanoTime() - startTime) / 1000;
 			System.out.println(dbType + " database took "+ totalTime + " microseconds to search by key range");
 		} catch (DatabaseException e) {

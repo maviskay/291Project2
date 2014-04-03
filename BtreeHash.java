@@ -132,7 +132,9 @@ public class BtreeHash {
 					if(lowerKey.compareTo(upperKey) < 0) {
 						if(searchByKeyRange(db, lowerKey, upperKey, dbType)) {
 							return;
-						}
+						} else {
+							System.out.println("No data was found within the range " + lowerKey + " & " + upperKey);
+						}	
 					} else {
 						System.out.print("Lower bound key must be smaller than upper bound key");
 					}
@@ -202,6 +204,7 @@ public class BtreeHash {
 	
 	// Searches the database by the range of key values
 	public static boolean searchByKeyRange(Database db, String lower, String upper, String dbType) {
+		boolean rtn = false;
 		try {
 			long startTime = 0;
 			Cursor dbCursor = db.openCursor(null, null);
@@ -215,11 +218,10 @@ public class BtreeHash {
 			upperKey.setSize(upper.length());
 			
 			dbCursor.getSearchKey(key, data, LockMode.DEFAULT);	
+			startTime = System.nanoTime();
 			while (key != upperKey) {
-				startTime = System.nanoTime();
 				if (db.get(null, key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-					long totalTime = (System.nanoTime() - startTime) / 1000;
-					System.out.println(dbType + " database took "+ totalTime + " microseconds to search by key range");
+					rtn = true;
 					String keyString = new String(key.getData());
 					String dataString = new String(data.getData());
 					writeToFile(keyString, dataString);
@@ -227,13 +229,12 @@ public class BtreeHash {
 				}
 				dbCursor.getNext(key, data, LockMode.DEFAULT);
 			}
-			return true;
+			long totalTime = (System.nanoTime() - startTime) / 1000;
+			System.out.println(dbType + " database took "+ totalTime + " microseconds to search by key range");
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
-		// Fallthrough case
-		System.out.println("No data was found within the range " + lower + " & " + upper);
-		return false;
+		return rtn;
 	}
 	
 	// Check if the user input is valid

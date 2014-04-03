@@ -129,8 +129,6 @@ public class BtreeHash {
 					if((lowerKey.length() < upperKey.length()) || ((lowerKey.length() == upperKey.length()) && (lowerKey.compareTo(upperKey) < 0 ))) {
 						if(searchByKeyRange(db, lowerKey, upperKey, dbType)) {
 							return;
-						} else {
-							System.out.println("No data was found within the range " + lowerKey + " & " + upperKey);
 						}	
 					} else {
 						System.out.println("Lower bound key must be smaller than upper bound key");
@@ -205,24 +203,19 @@ public class BtreeHash {
 			long startTime = 0;
 			int count = 0;
 			Cursor dbCursor = db.openCursor(null, null);
-			DatabaseEntry lowerKey = new DatabaseEntry();
-			DatabaseEntry upperKey = new DatabaseEntry();
 			DatabaseEntry data = new DatabaseEntry();
 			DatabaseEntry key = new DatabaseEntry();
 			// Max key & data length
 			key.setData(lower.getBytes());
-			key.setSize(127);
+			key.setSize(lower.length());
 			data.setSize(127);
-			lowerKey.setData(lower.getBytes());
-			lowerKey.setSize(lower.length());
-			upperKey.setData(upper.getBytes());
-			upperKey.setSize(upper.length());
 			
 			startTime = System.nanoTime();
 			dbCursor.getSearchKeyRange(key, data, LockMode.DEFAULT);
 			do {	
 				String keyString = new String(key.getData());
-				if (keyString.compareTo(upper) <= 0 && keyString.compareTo(lower) >= 0) {
+				// Check upper bound
+				if((keyString.length() < upper.length()) || ((keyString.length() == upper.length()) && (keyString.compareTo(upper) < 0 ))) {
 					count++;
 					keyString = new String(key.getData());
 					String dataString = new String(data.getData());

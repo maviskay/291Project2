@@ -56,7 +56,6 @@ public class BtreeHash {
         		key = "";
         		for ( int j = 0; j < range; j++ ) 
         			key+=(new Character((char)(97+random.nextInt(26)))).toString();
-        		
         		/* to create a DBT for key */
         		kdbt = new DatabaseEntry(key.getBytes());
         		kdbt.setSize(key.length()); 

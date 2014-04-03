@@ -126,14 +126,14 @@ public class BtreeHash {
 				}
 				// Searches database by key bounds - returns if key-data pair is found
 				if(isValid(lowerKey) && isValid(upperKey)) {
-					if(lowerKey.compareTo(upperKey) < 0) {
+					if(lowerKey.length() <= upperKey.length() && lowerKey.compareTo(upperKey) < 0) {
 						if(searchByKeyRange(db, lowerKey, upperKey, dbType)) {
 							return;
 						} else {
 							System.out.println("No data was found within the range " + lowerKey + " & " + upperKey);
 						}	
 					} else {
-						System.out.print("Lower bound key must be smaller than upper bound key");
+						System.out.println("Lower bound key must be smaller than upper bound key");
 					}
 				}
 			}	
@@ -195,44 +195,57 @@ public class BtreeHash {
 			e.printStackTrace();
 		}
 		// Fallthrough case
-		System.out.println("No matching " + searchType + " was not found\n");
+		System.out.println("No matching " + searchType + " was found\n");
 		return false;
 	}
 	
 	// Searches the database by the range of key values
 	public static boolean searchByKeyRange(Database db, String lower, String upper, String dbType) {
-		boolean rtn = false;
 		try {
 			long startTime = 0;
+			int count = 0;
 			Cursor dbCursor = db.openCursor(null, null);
 			DatabaseEntry lowerKey = new DatabaseEntry();
 			DatabaseEntry upperKey = new DatabaseEntry();
 			DatabaseEntry data = new DatabaseEntry();
 			DatabaseEntry key = new DatabaseEntry();
+			// Max key & data length
+			key.setData(lower.getBytes());
+			key.setSize(127);
+			data.setSize(127);
 			lowerKey.setData(lower.getBytes());
 			lowerKey.setSize(lower.length());
 			upperKey.setData(upper.getBytes());
 			upperKey.setSize(upper.length());
 			
-			dbCursor.getFirst(key, data, LockMode.DEFAULT);
-			String keyString = new String(key.getData());
 			startTime = System.nanoTime();
+			dbCursor.getSearchKeyRange(key, data, LockMode.DEFAULT);
 			do {	
-				System.out.println("I DO");
+				String keyString = new String(key.getData());
 				if (keyString.compareTo(upper) <= 0 && keyString.compareTo(lower) >= 0) {
-					rtn = true;
+					count++;
 					keyString = new String(key.getData());
 					String dataString = new String(data.getData());
 					writeToFile(keyString, dataString);
 					System.out.println("The key - data pair is:\n " + "\tkey:\t" + keyString + "\n\tdata:\t" + dataString);
 				}
 			} while (dbCursor.getNext(key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS);
+			// Key-data pairs found
+			if (count != 0) {
+				long totalTime = (System.nanoTime() - startTime) / 1000;
+				System.out.println(dbType + " database took "+ totalTime + " microseconds to search by key range");
+				System.out.println(" \t" + count + " results were found\n");
+				return true;
+			}
+			// No key-data pairs found
 			long totalTime = (System.nanoTime() - startTime) / 1000;
 			System.out.println(dbType + " database took "+ totalTime + " microseconds to search by key range");
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
-		return rtn;
+		// Fallthrough case
+		System.out.println("No matching key was not found within range\n");
+		return false;
 	}
 	
 	// Check if the user input is valid

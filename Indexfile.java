@@ -119,7 +119,7 @@ public class Indexfile {
 				}
 				if(BtreeHash.isValid(data)) {
 					// Searches database by specified data - returns if key-data pair is found
-					if(BtreeHash.searchByKeyData(dbIndex, data, "data", dbType)) {
+					if(BtreeHash.searchByKeyData(dbIndex, data, "key", dbType)) {
 						return;
 					}
 				}
@@ -137,7 +137,7 @@ public class Indexfile {
 				}
 				// Searches database by key bounds - returns if key-data pair is found
 				if(BtreeHash.isValid(lowerKey) && BtreeHash.isValid(upperKey)) {
-					if(lowerKey.compareTo(upperKey) < 0) {
+					if(lowerKey.length() <= upperKey.length() && lowerKey.compareTo(upperKey) < 0) {
 						if(BtreeHash.searchByKeyRange(db, lowerKey, upperKey, dbType)) {
 							return;
 						}

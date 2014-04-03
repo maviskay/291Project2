@@ -126,7 +126,7 @@ public class BtreeHash {
 				}
 				// Searches database by key bounds - returns if key-data pair is found
 				if(isValid(lowerKey) && isValid(upperKey)) {
-					if(lowerKey.length() <= upperKey.length() && lowerKey.compareTo(upperKey) < 0) {
+					if((lowerKey.length() < upperKey.length()) || ((lowerKey.length() == upperKey.length()) && (lowerKey.compareTo(upperKey) < 0 ))) {
 						if(searchByKeyRange(db, lowerKey, upperKey, dbType)) {
 							return;
 						} else {

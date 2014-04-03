@@ -111,12 +111,16 @@ public class mydbtest {
 					}
 				// Quit
 				} else if (selection == 6) {
-					// Removes directory and quits
-					boolean deleteDir = new File(path).delete();
-					if (!deleteDir){
-						System.out.println("Could not delete " + path + " directory \n\tTry deleting the database first.\n");
+					if (db == null) {
+						// Removes directory and quits
+						boolean deleteDir = new File(path).delete();
+						if (!deleteDir){
+							System.out.println("Could not delete " + path + " directory \n");
+						} else {
+							System.exit(0);
+						}
 					} else {
-						System.exit(0);
+						System.out.println("Try deleting the database first.\n");
 					}
 				} else {
 					System.out.println ("Invalid option\n");

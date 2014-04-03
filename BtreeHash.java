@@ -29,7 +29,7 @@ public class BtreeHash {
 						db = new Database(HASHDB, null, dbConfig);
 					}
 					// Populate database
-					System.out.println(dbType + " database has been created");
+					System.out.println(dbType + " database has been created, populating database");
 					populate(db, recordsCount);
 					System.out.println(recordsCount + " records inserted\n");
 					return db;

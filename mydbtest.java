@@ -1,5 +1,3 @@
-// TODO: test and document results + report
-
 import com.sleepycat.db.*;
 import java.io.*;
 import java.util.*;
@@ -101,9 +99,12 @@ public class mydbtest {
 								e.printStackTrace();
 							}
 						}
-						boolean deleteAns = new File("answers.txt").delete();
-						if (!deleteAns) {
-							System.out.println("Could not delete answers.txt, may want to check if answers.txt is still in directory. \n");
+						File ansFile = new File("answers.txt");
+						if(ansFile.exists()){
+							boolean deleteAns = ansFile.delete();
+							if (!deleteAns) {
+								System.out.println("Could not delete answers.txt, may want to check if answers.txt is still in directory. \n");
+							}
 						}
 					} else {
 						System.out.println (dbType + " database does not exist\n");

@@ -28,7 +28,7 @@ public class Indexfile {
 					dbConfigIndex.setAllowCreate(true);
 					dbIndex = new Database(INDEXDBREV, null, dbConfigIndex);
 					// Populate database
-					System.out.println(dbType + " database & it's indexing has been created");
+					System.out.println(dbType + " database & it's indexing has been created, populating database");
 					populate(db, dbIndex, recordsCount);
 					System.out.println(recordsCount + " records inserted\n");
 					// Add the database to list for returning

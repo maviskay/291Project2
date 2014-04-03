@@ -137,7 +137,7 @@ public class Indexfile {
 				}
 				// Searches database by key bounds - returns if key-data pair is found
 				if(BtreeHash.isValid(lowerKey) && BtreeHash.isValid(upperKey)) {
-					if(lowerKey.length() <= upperKey.length() && lowerKey.compareTo(upperKey) < 0) {
+					if(lowerKey.compareTo(upperKey) < 0 ) {
 						if(BtreeHash.searchByKeyRange(db, lowerKey, upperKey, dbType)) {
 							return;
 						}

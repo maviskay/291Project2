@@ -74,9 +74,7 @@ public class Indexfile {
         		ddbt.setSize(data.length()); 
         		
         		/* to insert the key/data pair into the database */
-                if (db.putNoOverwrite(null, kdbt, ddbt) == OperationStatus.KEYEXIST) {
-                	System.out.println("Key already exists\n");
-                } else {
+                if (db.putNoOverwrite(null, kdbt, ddbt) != OperationStatus.KEYEXIST) {
                 	kdbtIndex = new DatabaseEntry(data.getBytes());
                 	kdbtIndex.setSize(data.length());
                 	ddbtIndex = new DatabaseEntry(key.getBytes());

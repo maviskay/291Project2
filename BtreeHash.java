@@ -64,17 +64,15 @@ public class BtreeHash {
         		range = 64 + random.nextInt(64);
         		data = "";
         		for ( int j = 0; j < range; j++ ) 
-        			  data+=(new Character((char)(97+random.nextInt(26)))).toString();
+        			data+=(new Character((char)(97+random.nextInt(26)))).toString();
         		
         		/* to create a DBT for data */
         		ddbt = new DatabaseEntry(data.getBytes());
         		ddbt.setSize(data.length()); 
         		
         		/* to insert the key/data pair into the database */
-                if (db.putNoOverwrite(null, kdbt, ddbt) == OperationStatus.KEYEXIST) {
-                	System.out.println("Key already exists\n");
-                }
-            }
+                db.putNoOverwrite(null, kdbt, ddbt);
+            } 
         } catch (DatabaseException dbe) {
         	System.err.println("Populate the table: " + dbe.toString());
         }

@@ -218,6 +218,7 @@ public class BtreeHash {
 			String keyString = new String(key.getData());
 			startTime = System.nanoTime();
 			do {	
+				System.out.println("I DO");
 				if (keyString.compareTo(upper) <= 0 && keyString.compareTo(lower) >= 0) {
 					rtn = true;
 					keyString = new String(key.getData());

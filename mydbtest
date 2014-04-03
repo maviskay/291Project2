@@ -1,0 +1,5 @@
+#!/bin/sh
+chmod 700 mydbtest
+export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
+javac *.java
+java -cp .:/usr/share/java/db.jar mydbtest $1
